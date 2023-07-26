@@ -1,0 +1,11 @@
+{
+  "settings": {
+    "documentationRules": {
+      "companyName": "Richard Smith",
+      "copyrightText": "Copyright (c) Richard Smith. All rights reserved.",
+      "documentInterfaces": false,
+      "documentExposedElements": false,
+      "documentInternalElements": false
+    }
+  }
+}

@@ -11,6 +11,7 @@ namespace ESSkom.Console.EskomSePush
     using System.Linq;
     using System.Text;
     using System.Text.Json;
+    using System.Text.Json.Serialization;
     using System.Threading.Tasks;
     using ESSkom.Console;
     using Microsoft.Extensions.Logging;
@@ -23,37 +24,57 @@ namespace ESSkom.Console.EskomSePush
 
         private readonly HttpClient client;
         private readonly IDisposable? configChangeHandle;
-        private readonly JsonSerializerOptions jsonOptions = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
+        private readonly JsonSerializerOptions jsonOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
 
         public EskomSePushApi(IOptionsMonitor<ESSkomConfig> config, ILogger<EskomSePushApi> logger)
         {
             this.config = config;
             this.logger = logger;
 
-            this.configChangeHandle = this.config.OnChange(UpdateConfiguration);
+            this.configChangeHandle = this.config.OnChange(this.UpdateConfiguration);
 
             this.client = new HttpClient();
             this.client.DefaultRequestHeaders.Add("Token", config.CurrentValue.ESPToken);
         }
 
-        public async Task GetStatus()
+        public async Task<IDictionary<string, ESPStatusDto>> GetStatus()
         {
-            var client = new HttpClient();
             var request = new HttpRequestMessage(HttpMethod.Get, "https://developer.sepush.co.za/business/2.0/status");
-            var response = await client.SendAsync(request);
+            var response = await this.client.SendAsync(request);
             response.EnsureSuccessStatusCode();
-            Console.WriteLine(await response.Content.ReadAsStringAsync());
 
+            var jsonString = await response.Content.ReadAsStringAsync();
+
+            this.logger.LogDebug(jsonString);
+
+            var result = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, ESPStatusDto>>>(jsonString, this.jsonOptions);
+
+            if (result == null || !result.TryGetValue("status", out var r))
+            {
+                throw new JsonException();
+            }
+
+            return r;
         }
 
-        public async Task GetInformation(string areaId)
+        public async Task<ESPAreaDto> GetAreaInformation(string areaId)
         {
-            var client = new HttpClient();
-            var request = new HttpRequestMessage(HttpMethod.Get, "https://developer.sepush.co.za/business/2.0/area?id=eskde-10-fourwaysext10cityofjohannesburggauteng&test=current");
-            var response = await client.SendAsync(request);
+            var request = new HttpRequestMessage(HttpMethod.Get, $"https://developer.sepush.co.za/business/2.0/area?id={areaId}");
+            var response = await this.client.SendAsync(request);
             response.EnsureSuccessStatusCode();
-            Console.WriteLine(await response.Content.ReadAsStringAsync());
 
+            var jsonString = await response.Content.ReadAsStringAsync();
+
+            this.logger.LogDebug(jsonString);
+
+            var result = JsonSerializer.Deserialize<ESPAreaDto>(jsonString, this.jsonOptions);
+
+            if (result == null)
+            {
+                throw new JsonException();
+            }
+
+            return result;
         }
 
         public async Task<ESPAllowanceDto> GetAllowance()

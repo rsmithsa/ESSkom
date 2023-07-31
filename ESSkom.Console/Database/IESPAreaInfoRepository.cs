@@ -1,10 +1,10 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="IEskomSePushApi.cs" company="Richard Smith">
+// <copyright file="IESPAreaInfoRepository.cs" company="Richard Smith">
 //     Copyright (c) Richard Smith. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace ESSkom.Console.EskomSePush
+namespace ESSkom.Console.Database
 {
     using System;
     using System.Collections.Generic;
@@ -12,12 +12,12 @@ namespace ESSkom.Console.EskomSePush
     using System.Text;
     using System.Threading.Tasks;
 
-    public interface IEskomSePushApi
+    public interface IESPAreaInfoRepository
     {
-        Task<IDictionary<string, ESPStatusDto>> GetStatus();
+        Task<DateTime> GetLatestTimestamp();
 
-        Task<ESPAreaDto> GetAreaInformation(string areaId);
+        Task<IEnumerable<ESPAreaInfo>> GetAll();
 
-        Task<ESPAllowanceDto> GetAllowance();
+        Task<ESPAreaInfo> Insert(ESPAreaInfo areaInfo);
     }
 }

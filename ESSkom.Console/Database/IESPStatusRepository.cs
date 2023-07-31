@@ -1,23 +1,24 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="IEskomSePushApi.cs" company="Richard Smith">
+// <copyright file="IESPStatusRepository.cs" company="Richard Smith">
 //     Copyright (c) Richard Smith. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace ESSkom.Console.EskomSePush
+namespace ESSkom.Console.Database
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
 
-    public interface IEskomSePushApi
+    public interface IESPStatusRepository
     {
-        Task<IDictionary<string, ESPStatusDto>> GetStatus();
+        Task<DateTime> GetLatestTimestamp();
 
-        Task<ESPAreaDto> GetAreaInformation(string areaId);
+        Task<IEnumerable<ESPStatus>> GetAll();
 
-        Task<ESPAllowanceDto> GetAllowance();
+        Task<ICollection<ESPStatus>> Insert(ICollection<ESPStatus> status);
     }
 }

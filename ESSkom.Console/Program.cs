@@ -6,6 +6,7 @@
 
 namespace ESSkom.Console
 {
+    using ESSkom.Console.Database;
     using ESSkom.Console.EskomSePush;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
@@ -29,7 +30,11 @@ namespace ESSkom.Console
                 {
                     services.Configure<ESSkomConfig>(context.Configuration.GetSection(nameof(ESSkomConfig)));
 
+                    services.AddSingleton<IDatabaseConnectionFactory, DatabaseConnectionFactory>();
                     services.AddSingleton<IEskomSePushApi, EskomSePushApi>();
+
+                    services.AddSingleton<IESPStatusRepository, ESPStatusRepository>();
+                    services.AddSingleton<IESPAreaInfoRepository, ESPAreaInfoRepository>();
 
                     services.AddHostedService<ESSkomJob>();
                 })

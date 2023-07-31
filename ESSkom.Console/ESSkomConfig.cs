@@ -14,6 +14,12 @@ namespace ESSkom.Console
 
     public class ESSkomConfig
     {
+        public string ConnectionString { get; set; }
+
         public string ESPToken { get; set; }
+
+        public string ESPAreaId { get; set; }
+
+        public TimeSpan StatusPollInterval { get; set; }
     }
 }
